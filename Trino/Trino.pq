@@ -298,7 +298,8 @@ GetPage = (url as text, User as text, Retries as number, Timeout as number) as t
                         else if Text.Contains([type], "double") then type number //DOUBLE  
                         else if Text.Contains([type], "varbinary") then type binary //VARBINARY
                         else type text), //INTERVAL YEAR TO MONTH, INTERVAL DAY TO SECOND, MAP, JSON, ARRAY, ROW, IPADDRESS, UUID
-                    ColumnTableMappingTranspose = Table.Transpose(Table.SelectColumns(ColumnTableMapping,{"name","typeMapping"})),
+                    notArrayColumns= Table.SelectRows(ColumnTableMapping, each not Text.Contains([type], "array") ),
+                    ColumnTableMappingTranspose = Table.Transpose(Table.SelectColumns(notArrayColumns,{"name","typeMapping"})),
                     ColumnTableMappingTransposeList = Table.ToColumns(ColumnTableMappingTranspose),
 
                     //Prepare corresponding data
@@ -327,10 +328,25 @@ GetPage = (url as text, User as text, Retries as number, Timeout as number) as t
                             in
                                 TableFinal
                         else
-                            DataTableReType
-                
+                            DataTableReType,
+                    
+                    //array
+                    arrayColumns = Table.SelectRows(ColumnTable, each (Text.Contains([type], "array")) ),
+                    arrayColumnsTranspose = Table.Transpose(Table.SelectColumns(arrayColumns,{"name"})),
+                    arrayColumnsList = List.Combine(Table.ToColumns(arrayColumnsTranspose)),
+                    treatedArrays = 
+                        if (List.Count(arrayColumnsList) > 0) then
+                            let
+                                arrayTransformList=List.Transform(arrayColumnsList, each{_, each "[" & Text.Combine(List.Transform(_, each Text.From(_, "en-US")), ", ") & "]", type text }),
+                                TableFinal=Table.TransformColumns(treatedTimestamps,arrayTransformList)
+                            in
+                                TableFinal
+                        else
+                            treatedTimestamps
+
                 in
-                    treatedTimestamps 
+                    treatedArrays 
+                    
             else if (Record.HasFields(body, {"error"})) then 
                 let
                     Output = error Error.Record("Trino Error: " & body[error][errorName], body[error][message], body[error][failureInfo][stack])
