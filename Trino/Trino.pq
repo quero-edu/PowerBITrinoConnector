@@ -65,6 +65,7 @@ shared TrinoType = type function (
     ];
 
 DefaultUser = "TrinoPBI";
+SourceName= "PowerBI conector 0.7.2";
 DefaultRetries = 5;
 DefaultTimeout = 100;
 DefaultDelayAPICallRetry = #duration(0,0,0,1/2);
@@ -90,7 +91,7 @@ TrinoImpl = (Host as text, Port as number, optional Catalog as text, optional Us
                                 response = Web.Contents(Url,
                                     [
                                         Content = Text.ToBinary(SQLQuery),
-                                        Headers = [#"X-Trino-User" = User],
+                                        Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName],
                                         Timeout = #duration(0, 0, 0, Timeout),
                                         IsRetry = isRetry
                                     ]
@@ -120,7 +121,7 @@ PostStatementCatalogs = (url as text, optional Catalog as text, optional User as
                         response = Web.Contents(url,
                             [
                                  Content = Text.ToBinary("show catalogs")
-                                ,Headers = [#"X-Trino-User" = User]
+                                ,Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry
                             ]
@@ -146,7 +147,7 @@ PostStatementSchemas = (url as text, Catalog as text, User as text, Retries as n
                         response = Web.Contents(url,
                             [
                                  Content = Text.ToBinary("select schema_name from """ & Catalog & """.information_schema.schemata")
-                                ,Headers = [#"X-Trino-User" = User]
+                                ,Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry
                             ]
@@ -172,7 +173,7 @@ PostStatementTables = (url as text, Catalog as text, Schema as text, User as tex
                         response = Web.Contents(url, 
                             [
                                  Content = Text.ToBinary("select table_name, table_schema from """ & Catalog & """.information_schema.tables where table_schema = '" & Schema & "'")
-                                ,Headers = [#"X-Trino-User" = User]
+                                ,Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry
                             ]
@@ -199,7 +200,7 @@ PostStatementQueryColumnNames = (url as text, Catalog as text, schema as text, t
                         response = Web.Contents(url, 
                             [
                                  Content = Text.ToBinary("select column_name from """ & Catalog & """.information_schema.columns where table_schema = '" & schema & "' and table_name = '" & table & "' order by ordinal_position")
-                                ,Headers = [#"X-Trino-User" = User]
+                                ,Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry
                             ]
@@ -236,7 +237,7 @@ PostStatementQueryTables = (url as text, Catalog as text, schema as text, table 
                             [
                                  Content = Text.ToBinary("select " & ColumnNameStringSelectString & " from """ & Catalog & """." & schema & "." & table)
                                  //Content = Text.ToBinary("select * from " & Catalog & "." & schema & "." & table)
-                                ,Headers = [#"X-Trino-User" = User]
+                                ,Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry
                             ]
@@ -261,7 +262,7 @@ GetPage = (url as text, User as text, Retries as number, Timeout as number) as t
                         isRetry = if iteration > 0 then true else false,
                         response = Web.Contents(url, 
                             [
-                                 Headers = [#"X-Trino-User" = User]
+                                 Headers = [#"X-Trino-User" = User, #"X-Trino-Source" = SourceName]
                                 ,Timeout = #duration(0, 0, 0, Timeout)
                                 ,IsRetry = isRetry                             
                             ]
@@ -346,7 +347,7 @@ GetPage = (url as text, User as text, Retries as number, Timeout as number) as t
 
                 in
                     treatedArrays 
-                    
+
             else if (Record.HasFields(body, {"error"})) then 
                 let
                     Output = error Error.Record("Trino Error: " & body[error][errorName], body[error][message], body[error][failureInfo][stack])
