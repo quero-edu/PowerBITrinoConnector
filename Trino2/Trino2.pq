@@ -594,8 +594,8 @@ Trino2.Publish = [
 ];
 
 Trino2.Icons = [
-    Icon16 = { Extension.Contents("Trino16.png"), Extension.Contents("Trino20.png"), Extension.Contents("Trino24.png"), Extension.Contents("Trino32.png") },
-    Icon32 = { Extension.Contents("Trino32.png"), Extension.Contents("Trino40.png"), Extension.Contents("Trino48.png"), Extension.Contents("Trino64.png") }
+    Icon16 = { Extension.Contents("Trino216.png"), Extension.Contents("Trino220.png"), Extension.Contents("Trino224.png"), Extension.Contents("Trino232.png") },
+    Icon32 = { Extension.Contents("Trino232.png"), Extension.Contents("Trino240.png"), Extension.Contents("Trino248.png"), Extension.Contents("Trino264.png") }
 ];
 
 //////////////////////
