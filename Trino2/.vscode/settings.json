@@ -1,5 +1,6 @@
 {
   "powerquery.sdk.defaultQueryFile": "${workspaceFolder}\\${workspaceFolderBasename}.query.pq",
   "powerquery.sdk.defaultExtension": "${workspaceFolder}\\bin\\AnyCPU\\Debug\\${workspaceFolderBasename}.mez",
-  "powerquery.general.mode": "SDK"
+  "powerquery.general.mode": "SDK",
+  "powerquery.trace.server": "verbose",
 }
