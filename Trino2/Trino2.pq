@@ -66,7 +66,7 @@ shared Trino2Type = type function (
     ];
 
 DefaultUser = "TrinoPBI";
-SourceName= "PowerBI conector 0.8.0";
+SourceName= "PowerBI conector 2.0.0";
 DefaultRetries = 5;
 DefaultTimeout = 100;
 DefaultDelayAPICallRetry = #duration(0,0,0,1/2);
